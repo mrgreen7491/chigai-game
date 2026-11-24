@@ -1,0 +1,72 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f8f7">
+  <title>ちがいはどれ？</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <main class="game-shell">
+    <header class="topbar">
+      <div class="brand">ちがいはどれ？</div>
+      <div id="question-count" class="question-count">だい１もん</div>
+    </header>
+
+    <section class="stage" aria-live="polite">
+      <div id="welcome" class="message-screen">
+        <p class="eyebrow">みんなで かんがえましょう</p>
+        <h1 id="welcome-title">ちがう いきものは<br>どれでしょう？</h1>
+        <p id="welcome-subtitle" class="sub-message">４まいの えを よくみてください</p>
+      </div>
+
+      <div id="motion-screen" class="motion-screen" hidden>
+        <p id="motion-message" class="motion-message" hidden></p>
+        <div id="moving-card" class="moving-card">
+          <img id="moving-image" src="" alt="">
+        </div>
+      </div>
+
+      <div id="answer-screen" class="answer-screen" hidden>
+        <h1 id="answer-title">ちがうのは なんばんめ？</h1>
+        <p id="answer-hint" class="sub-message">こたえを くちで おしえてください</p>
+        <div class="number-row" aria-label="えの番号">
+          <span>①</span><span>②</span><span>③</span><span>④</span>
+        </div>
+      </div>
+
+      <div id="reveal-screen" class="reveal-screen" hidden>
+        <h1 id="result-title"></h1>
+        <p id="result-detail" class="sub-message"></p>
+        <div id="reveal-grid" class="reveal-grid"></div>
+      </div>
+
+      <div id="finish-screen" class="message-screen" hidden>
+        <p id="finish-greeting" class="eyebrow">みなさん、さいごまでご参加ありがとうございました！</p>
+        <h1 id="finish-title">たくさん考えて、<br>たくさん気づけましたね。</h1>
+        <p id="finish-subtitle" class="sub-message">これからも、みなさん元気で楽しい毎日をお過ごしください。</p>
+        <p id="finish-closing" class="eyebrow">またいっしょに遊びましょう！</p>
+      </div>
+    </section>
+
+    <footer class="staff-panel">
+      <div class="staff-controls">
+        <label class="difficulty-control" for="difficulty">
+          <span>はやさ</span>
+          <select id="difficulty">
+            <option value="5000">かんたん（５びょう）</option>
+            <option value="4000">ふつう（４びょう）</option>
+            <option value="3000">むずかしい（３びょう）</option>
+          </select>
+        </label>
+        <div id="staff-actions" class="staff-actions">
+          <button id="start-button" class="button button-primary">あいさつ</button>
+        </div>
+      </div>
+      <p id="staff-status" class="staff-status">スタッフが「はじめる」をおしてください</p>
+    </footer>
+  </main>
+  <script src="app.js"></script>
+</body>
+</html>

@@ -270,3 +270,44 @@ h1 {
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { scroll-behavior: auto !important; }
 }
+
+.button-sub { color: var(--teal-dark); background: #fff; border: 3px solid #a9bfba; font-size: clamp(16px, 1.4vw, 22px); min-height: 48px; }
+.button-sub:hover { background: #e3f0ed; }
+
+/* ==========================================================
+   テレビ表示（横長の画面で、1画面に収める）  ※2026-11-25追加
+   幅900px以上の横長画面だけに効きます。スマホ・縦長画面は、これまでどおりです。
+========================================================== */
+@media (min-width: 900px) and (min-aspect-ratio: 5/4) {
+  body { min-height: 0; height: 100vh; overflow: hidden; }
+  .game-shell { height: 100vh; min-height: 0; }
+  .topbar { min-height: 0; padding: 1vh 3vw; }
+  .brand { font-size: min(34px, 3.6vh); }
+  .question-count { padding: 0.6vh 1.6vw; font-size: min(27px, 2.8vh); }
+
+  .stage { padding: 1vh 3vw; overflow: hidden; }
+  h1 { font-size: min(88px, 8.2vh); }
+  .eyebrow { margin-bottom: 1.4vh; font-size: min(32px, 3.2vh); }
+  .sub-message { margin-top: 1.6vh; font-size: min(38px, 3.6vh); }
+  .motion-message { font-size: min(50px, 4.6vh); }
+
+  .number-row { margin-top: 4vh; }
+  .number-row span { min-height: min(145px, 15vh); font-size: min(84px, 8.4vh); border-radius: 2vh; }
+
+  /* 答えの画面：2行の見出し＋説明＋4枚の絵が、1画面に収まるようにする */
+  #result-title { font-size: min(72px, 6.6vh); line-height: 1.22; }
+  #result-detail { font-size: min(36px, 3.3vh); line-height: 1.4; margin-top: 1vh; }
+  .reveal-grid { width: min(100%, 146vh); margin: 1.6vh auto 0; gap: min(24px, 1.8vh); }
+  .reveal-card { padding: 0.8vh; border-radius: 2vh; }
+  .reveal-number { padding-top: 0.2vh; font-size: min(42px, 4vh); line-height: 1.2; }
+
+  /* スタッフの操作エリア（下の段） */
+  .staff-panel { padding: 1vh 3vw 0.8vh; }
+  .staff-controls { gap: 1.6vw; }
+  .difficulty-control { font-size: min(22px, 2.3vh); }
+  .difficulty-control select { min-height: 0; padding: 0.7vh 0.8vw; font-size: min(21px, 2.3vh); }
+  .button { min-height: 0; padding: 1vh 1.8vw; font-size: min(28px, 3vh); }
+  .button-sub { min-height: 0; font-size: min(22px, 2.3vh); padding: 0.8vh 1.2vw; }
+  .staff-actions { flex: 1; }
+  .staff-status { min-height: 0; margin-top: 0.6vh; font-size: min(18px, 2vh); }
+}

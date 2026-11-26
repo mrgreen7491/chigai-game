@@ -176,7 +176,56 @@
   const introAudio = new Audio("audio/intro.wav");
   const endingAudio = new Audio("audio/ending.wav");
 
+  // ---- 口パク（声の大きさを測って、4枚の画像を切りかえる） ----
+  const CH = { close: "chara_close.jpg", half: "chara_half.jpg", open: "chara_open.jpg", blink: "chara_blink.jpg" };
+  Object.values(CH).forEach((src) => { const im = new Image(); im.src = src; });
+  const LIP_OPEN = 140, LIP_HALF = 60; // しきい値（声の大きさ。あとで調整できる）
+  let lipCtx = null, lipAn = null, lipTimer = null, blinkTimer = null, blinking = false, lipAudio = null;
+  const lipSrc = new WeakMap();
+  function setChara(key) { document.querySelectorAll(".charaimg").forEach((im) => { im.src = CH[key]; }); }
+  function lipEnsureCtx() {
+    // 声の解析は、インターネット上（https）だけで使える。パソコン内のファイルを直接開いたときは、簡易の口パク。
+    if (lipCtx || !/^https?:$/.test(location.protocol)) return;
+    try {
+      lipCtx = new (window.AudioContext || window.webkitAudioContext)();
+      lipAn = lipCtx.createAnalyser(); lipAn.fftSize = 256; lipAn.smoothingTimeConstant = 0.3;
+      lipAn.connect(lipCtx.destination);
+    } catch (e) { lipCtx = null; lipAn = null; }
+  }
+  function lipStart(audio, canCreate) {
+    lipStop(); lipAudio = audio;
+    if (canCreate) lipEnsureCtx(); // 「あいさつ」ボタンを押した直後だけ作る（ブラウザの決まり）
+    let useAn = false;
+    if (lipAn) {
+      try {
+        if (!lipSrc.has(audio)) { const s = lipCtx.createMediaElementSource(audio); s.connect(lipAn); lipSrc.set(audio, s); }
+        useAn = true;
+        if (lipCtx.state === "suspended") lipCtx.resume();
+      } catch (e) { useAn = false; }
+    }
+    const data = useAn ? new Uint8Array(lipAn.frequencyBinCount) : null;
+    lipTimer = setInterval(() => {
+      if (blinking) return;
+      if (!lipAudio || lipAudio.paused || lipAudio.ended) { setChara("close"); return; }
+      if (!useAn) { const r = Math.random(); setChara(r > .66 ? "open" : (r > .33 ? "half" : "close")); return; }
+      lipAn.getByteFrequencyData(data);
+      let sum = 0; for (let i = 0; i < 30; i += 1) sum += data[i];
+      const avg = sum / 30; window.__lipAvg = avg;
+      setChara(avg > LIP_OPEN ? "open" : (avg > LIP_HALF ? "half" : "close"));
+    }, 90);
+    const sched = () => { blinkTimer = setTimeout(() => {
+      if (lipAudio && !lipAudio.paused && !lipAudio.ended) { blinking = true; setChara("blink"); setTimeout(() => { blinking = false; setChara("close"); }, 150); }
+      sched();
+    }, 3000 + Math.random() * 2000); };
+    sched();
+  }
+  function lipStop() {
+    clearInterval(lipTimer); clearTimeout(blinkTimer); lipTimer = null; blinkTimer = null; blinking = false; lipAudio = null;
+    setChara("close");
+  }
+
   function stopAllAudio() {
+    lipStop();
     [introAudio, endingAudio].forEach((audio) => {
       audio.pause();
       audio.currentTime = 0;
@@ -318,6 +367,7 @@
     cancelTimers();
     stopAllAudio();
     updateQuestionHeader(initialQuestionIndex);
+    showScreen("welcome"); // 「もういちど あそぶ」のときも、あいさつの画面に戻す
     setActions([]); // ボタンを無効化して二重押しを防ぐ
     status.textContent = "いまから はじめます…";
 
@@ -347,6 +397,7 @@
     }, { once: true });
 
     // 音声再生失敗時もすぐに「はじめる」ボタンを出す（ブラウザ制限・ファイルエラーなど）
+    lipStart(introAudio, true);
     introAudio.play().catch(() => {
       window.clearTimeout(timeoutId);
       showStartButton();
@@ -492,6 +543,7 @@
     const fullWidthNumbers = ["０", "１", "２", "３", "４", "５", "６", "７", "８", "９", "１０", "１１", "１２", "１３", "１４", "１５"];
     const isLastQuestion = questionIndex === questions.length - 1;
     if (isLastQuestion) {
+      lipStart(endingAudio, false);
       endingAudio.play().catch(() => {});
     }
     finishGreeting.textContent = isLastQuestion

@@ -311,3 +311,20 @@ h1 {
   .staff-actions { flex: 1; }
   .staff-status { min-height: 0; margin-top: 0.6vh; font-size: min(18px, 2vh); }
 }
+
+
+/* ==========================================================
+   キャラクター（はじめのあいさつ・さいごのあいさつの画面だけ。声に合わせて口が動く）
+========================================================== */
+.message-screen .chara { display: none; }
+@media (min-width: 900px) and (min-aspect-ratio: 5/4) {
+  #welcome:not([hidden]), #finish-screen:not([hidden]) {
+    display: grid; grid-template-columns: auto 1fr; align-items: center; column-gap: 3vw;
+    width: 100%;
+  }
+  .message-screen .chara { display: block; width: min(32vw, 60vh); }
+  .message-screen .chara img { display: block; width: 100%; height: auto; border-radius: 2vh; box-shadow: 0 .8vh 2vh rgba(0,0,0,.22); }
+  .message-screen .msg { min-width: 0; }
+  #welcome h1, #finish-screen h1 { font-size: min(76px, 7.4vh); }
+  #finish-screen .sub-message { font-size: min(32px, 3.2vh); }
+}

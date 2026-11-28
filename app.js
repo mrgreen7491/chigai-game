@@ -10,7 +10,8 @@
         { name: "すずめ", file: "04_sparrow.png" }
       ],
       intro: "ちがう いきものは<br>どれでしょう？",
-      correctCard: 4
+      correctCard: 4,
+      explanation: "いぬ・ねこ・うまは ４ほんあしの どうぶつ、すずめは とりです"
     },
     {
       cards: [

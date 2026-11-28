@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="theme-color" content="#f5f8f7">
   <title>ちがいはどれ？</title>
-  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="style.css?v=2">
 </head>
 <body>
   <main class="game-shell">
@@ -59,11 +59,12 @@
     <footer class="staff-panel">
       <div class="staff-controls">
         <label class="difficulty-control" for="difficulty">
-          <span>はやさ</span>
+          <span>みせかた</span>
           <select id="difficulty">
-            <option value="5000">かんたん（５びょう）</option>
-            <option value="4000">ふつう（４びょう）</option>
-            <option value="3000">むずかしい（３びょう）</option>
+            <option value="0" selected>とまったまま（４まい）</option>
+            <option value="5000">ながれる・かんたん（５びょう）</option>
+            <option value="4000">ながれる・ふつう（４びょう）</option>
+            <option value="3000">ながれる・むずかしい（３びょう）</option>
           </select>
         </label>
         <button id="btnFullscreen" type="button" class="button button-sub" aria-label="全画面表示">⛶ 全画面</button>
@@ -74,7 +75,7 @@
       <p id="staff-status" class="staff-status">スタッフが「はじめる」をおしてください</p>
     </footer>
   </main>
-  <script src="app.js"></script>
+  <script src="app.js?v=2"></script>
   <script>
   /* スタッフ用 全画面ボタン */
   (function(){

@@ -27,12 +27,12 @@
       cards: [
         { name: "じどうしゃ", file: "01_car.png" },
         { name: "しんかんせん", file: "02_shinkansen.png" },
-        { name: "ひこうき", file: "03_airplane.png" },
+        { name: "ばす", file: "03_bus.png" },
         { name: "じてんしゃ", file: "04_bicycle.png" }
       ],
       intro: "ちがう のりものは<br>どれでしょう？",
       correctCard: 4,
-      explanation: "ほかの のりものは エンジンで うごきますが、じてんしゃは ひとが こいで すすみます"
+      explanation: "ほかの のりものは でんきや エンジンで うごきますが、じてんしゃは ひとが こいで すすみます"
     },
     {
       cards: [
@@ -173,6 +173,7 @@
   let attempt = 0;
   let timers = [];
   let animationToken = 0;
+  let still = true; // true：4まいを とまったまま いっぺんに見せる
   const introAudio = new Audio("audio/intro.wav");
   const endingAudio = new Audio("audio/ending.wav");
 
@@ -281,7 +282,7 @@
     ...card,
     src: `images/parts/set${String(questionIndex + 1).padStart(2, "0")}/${card.file}`
   }));
-  const currentOrder = () => attempt === 0
+  const currentOrder = () => (attempt === 0 || still)
     ? currentQuestion().firstPassOrder
     : currentQuestion().retryOrder;
   const currentCorrectNumber = () =>
@@ -409,10 +410,12 @@
     stopAllAudio();
     questionIndex = index;
     attempt = 0;
+    still = difficulty.value === "0";
     updateQuestionHeader(questionIndex);
     answerTitle.textContent = "ちがうのは なんばんめ？";
     answerHint.textContent = "こたえを くちで おしえてください";
     status.textContent = "えを よくみてください";
+    if (still) { showStill(); return; }
     beginSequence(currentQuestion().firstPassOrder, "right");
   }
 
@@ -473,6 +476,44 @@
       : "もういちど こたえを えらんでください";
   }
 
+  // 4まいの えと ばんごうを ならべる
+  function fillGrid(onPick) {
+    revealGrid.replaceChildren();
+    const cards = currentCards();
+    currentOrder().forEach((cardNumber, index) => {
+      const card = cards[cardNumber - 1];
+      const tile = document.createElement(onPick ? "button" : "div");
+      tile.className = "reveal-card";
+      if (onPick) {
+        tile.type = "button";
+        tile.addEventListener("click", () => onPick(index + 1));
+      } else if (cardNumber === currentQuestion().correctCard) {
+        tile.classList.add("is-answer");
+      }
+      const image = document.createElement("img");
+      image.src = card.src;
+      image.alt = onPick ? "" : card.name;
+      const label = document.createElement("span");
+      label.className = "reveal-number";
+      label.textContent = `${index + 1}ばん`;
+      tile.append(image, label);
+      revealGrid.append(tile);
+    });
+  }
+
+  // とまったまま版の もんだい画面
+  function showStill() {
+    cancelTimers();
+    showScreen("reveal");
+    screens.reveal.classList.add("still");
+    resultTitle.innerHTML = currentQuestion().intro.replace("<br>", " ");
+    resultTitle.classList.remove("is-wrong");
+    resultDetail.textContent = "なんばんめか、こたえを おしえてください";
+    fillGrid(submitAnswer);
+    makeAnswerButtons();
+    status.textContent = "スタッフが こたえのばんごう（または え）を おしてください";
+  }
+
   function submitAnswer(number) {
     cancelTimers();
     if (number === currentCorrectNumber()) {
@@ -481,6 +522,17 @@
     }
 
     attempt += 1;
+    if (attempt === 1 && still) {
+      resultTitle.textContent = "おしい！ もういちど！";
+      resultTitle.classList.add("is-wrong");
+      resultDetail.textContent = "ほかの えを よくみてください";
+      [revealGrid.children[number - 1], actions.children[number - 1]].forEach((el) => {
+        el.disabled = true;
+        el.classList.add("is-out");
+      });
+      status.textContent = "もういちど こたえを えらんでください";
+      return;
+    }
     if (attempt === 1) {
       status.textContent = "もういちど えを みてください";
       beginSequence(currentQuestion().retryOrder, "left", "もういちど、よくみてください");
@@ -491,7 +543,7 @@
 
   function revealAnswer(correct, showSolution) {
     showScreen("reveal");
-    const displayOrder = currentOrder();
+    screens.reveal.classList.remove("still");
     const correctNumber = currentCorrectNumber();
     const correctName = currentQuestion().cards[currentQuestion().correctCard - 1].name;
     resultTitle.textContent = correct
@@ -501,22 +553,7 @@
     resultDetail.textContent = correct
       ? "どうして ちがうのか、みんなで はなしましょう"
       : currentQuestion().explanation;
-    revealGrid.replaceChildren();
-
-    const cards = currentCards();
-    displayOrder.forEach((cardNumber, index) => {
-      const card = cards[cardNumber - 1];
-      const tile = document.createElement("div");
-      tile.className = `reveal-card${cardNumber === currentQuestion().correctCard ? " is-answer" : ""}`;
-      const image = document.createElement("img");
-      image.src = card.src;
-      image.alt = card.name;
-      const label = document.createElement("span");
-      label.className = "reveal-number";
-      label.textContent = `${index + 1}ばん`;
-      tile.append(image, label);
-      revealGrid.append(tile);
-    });
+    fillGrid(null);
 
     if (correct || showSolution) {
       status.textContent = correct

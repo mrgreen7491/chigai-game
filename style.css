@@ -328,3 +328,14 @@ h1 {
   #welcome h1, #finish-screen h1 { font-size: min(76px, 7.4vh); }
   #finish-screen .sub-message { font-size: min(32px, 3.2vh); }
 }
+
+/* ===== とまったまま版（4まい いっぺんに） ===== */
+button.reveal-card { cursor: pointer; color: inherit; }
+button.reveal-card:hover { border-color: var(--teal); }
+.reveal-card.is-out { opacity: .25; cursor: default; }
+.button.is-out { opacity: .3; cursor: default; }
+@media (min-width: 900px) and (min-aspect-ratio: 5/4) {
+  .reveal-screen.still { width: 100%; }
+  .reveal-screen.still .reveal-grid { width: min(100%, 205vh); margin-top: 3.5vh; }
+  .reveal-screen.still #result-detail { margin-top: 1.4vh; }
+}

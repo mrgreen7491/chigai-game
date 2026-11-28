@@ -181,6 +181,9 @@
   const incorrectAudio = new Audio("audio/incorrect.wav");
   correctAudio.preload = "auto";
   incorrectAudio.preload = "auto";
+  // 2回まちがえて、答えが出るときの音
+  const incorrectFinalAudio = new Audio("audio/incorrect_final.wav");
+  incorrectFinalAudio.preload = "auto";
 
   // ---- 口パク（声の大きさを測って、4枚の画像を切りかえる） ----
   const CH = { close: "chara_close.jpg", half: "chara_half.jpg", open: "chara_open.jpg", blink: "chara_blink.jpg" };
@@ -232,15 +235,15 @@
 
   function stopAllAudio() {
     lipStop();
-    [introAudio, endingAudio, correctAudio, incorrectAudio].forEach((audio) => {
+    [introAudio, endingAudio, correctAudio, incorrectAudio, incorrectFinalAudio].forEach((audio) => {
       audio.pause();
       audio.currentTime = 0;
     });
   }
 
-  function playResultSound(correct) {
+  function playResultSound(audio) {
     stopAllAudio();
-    (correct ? correctAudio : incorrectAudio).play().catch(() => {});
+    audio.play().catch(() => {});
   }
 
   function shuffle(values) {
@@ -526,7 +529,9 @@
 
   function submitAnswer(number) {
     cancelTimers();
-    playResultSound(number === currentCorrectNumber());
+    playResultSound(number === currentCorrectNumber()
+      ? correctAudio
+      : attempt === 0 ? incorrectAudio : incorrectFinalAudio);
     if (number === currentCorrectNumber()) {
       revealAnswer(true, false);
       return;
